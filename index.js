@@ -130,6 +130,12 @@ const FileType = {
 const FINISH = 'finish';
 
 /**
+ * The error event
+ * @type {String}
+ */
+const ERROR = 'error';
+
+/**
  * The minified suffix
  * @type {String}
  */
@@ -225,7 +231,7 @@ function _minifyJS(files, reload) {
 	console.log('Minifying JavaScript files...\n', files);
 	return gulp
 		.src(files)
-		.pipe(babel())
+		.pipe(babel().on(ERROR, console.log))
 		.pipe(uglify())
 		.pipe(rename({
 			suffix: MIN
