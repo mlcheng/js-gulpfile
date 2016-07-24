@@ -149,6 +149,12 @@ const ERROR = 'error';
 const MIN = '.min';
 
 /**
+ * The prefix for each module required
+ * @type {String}
+ */
+const LIB_PREFIX = 'iqwerty-';
+
+/**
  * The bundled suffix, for use with browserify
  * @type {String}
  */
@@ -248,9 +254,11 @@ function _minifyJS(files, reload) {
 		}
 	};
 	globule.find(files).forEach(function(file) {
-		browserify(file)
+		const filename = path.parse(file).name;
+		browserify(file, { externalRequireName: `window['require']` })
+			.require(file, { expose: LIB_PREFIX + filename })
 			.bundle()
-			.pipe(source(`${path.parse(file).name}${BUNDLED}${MIN}.js`))
+			.pipe(source(`${filename}${BUNDLED}${MIN}.js`))
 			.pipe(streamify(babel().on(ERROR, console.log)))
 			.pipe(streamify(uglify()))
 			.pipe(gulp.dest('.'))
