@@ -15,10 +15,17 @@
 
 const gulp = require('gulp');
 const debug = require('gulp-debug'); // jshint ignore:line
+const globule = require('globule');
+const fs = require('fs');
+const path = require('path');
+
+const source = require('vinyl-source-stream');
+const streamify = require('gulp-streamify');
+
+const browserify = require('browserify');
 
 const babel = require('gulp-babel');
 const rename = require('gulp-rename');
-const fs = require('fs');
 
 const tinylr = require('tiny-lr')();
 const request = require('request');
@@ -229,19 +236,19 @@ function minifyJS() {
 
 function _minifyJS(files, reload) {
 	console.log('Minifying JavaScript files...\n', files);
-	return gulp
-		.src(files)
-		.pipe(babel().on(ERROR, console.log))
-		.pipe(uglify())
-		.pipe(rename({
-			suffix: MIN
-		}))
-		.pipe(gulp.dest('.'))
-		.on(FINISH, function() {
-			if(reload) {
-				notifyChange(files);
-			}
-		});
+	globule.find(files).forEach(function(file) {
+		browserify(file)
+			.bundle()
+			.pipe(source(`${path.parse(file).name}${MIN}.js`))
+			.pipe(streamify(babel().on(ERROR, console.log)))
+			.pipe(streamify(uglify()))
+			.pipe(gulp.dest('.'))
+			.on(FINISH, function() {
+				if(reload) {
+					notifyChange(file);
+				}
+			});
+	});
 }
 
 
