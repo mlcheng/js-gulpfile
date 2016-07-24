@@ -149,6 +149,12 @@ const ERROR = 'error';
 const MIN = '.min';
 
 /**
+ * The bundled suffix, for use with browserify
+ * @type {String}
+ */
+const BUNDLED = '.mod';
+
+/**
  * The directory where gulp is initialized
  * @type {String}
  */
@@ -236,19 +242,29 @@ function minifyJS() {
 
 function _minifyJS(files, reload) {
 	console.log('Minifying JavaScript files...\n', files);
+	const _r = what => {
+		if(reload) {
+			notifyChange(what);
+		}
+	};
 	globule.find(files).forEach(function(file) {
 		browserify(file)
 			.bundle()
-			.pipe(source(`${path.parse(file).name}${MIN}.js`))
+			.pipe(source(`${path.parse(file).name}${BUNDLED}${MIN}.js`))
 			.pipe(streamify(babel().on(ERROR, console.log)))
 			.pipe(streamify(uglify()))
 			.pipe(gulp.dest('.'))
-			.on(FINISH, function() {
-				if(reload) {
-					notifyChange(file);
-				}
-			});
+			.on(FINISH, () => _r(file));
 	});
+	gulp
+		.src(files)
+		.pipe(babel().on(ERROR, console.log))
+		.pipe(uglify())
+		.pipe(rename({
+			suffix: MIN
+		}))
+		.pipe(gulp.dest(''))
+		.on(FINISH, () => _r(files));
 }
 
 
