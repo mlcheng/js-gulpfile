@@ -112,7 +112,7 @@ TASKS.forEach(taskObject => {
 const LR_PORT = 35729;
 const LR_SERVER = 'http://localhost:' + LR_PORT;
 const MINIFIED_FILES = ['./**/*.min.*'];
-const JS_FILES = ['./**/*.js', '!./**/*.min.js', '!./**/*gulpfile.js', '!./**/tests/*.js'];
+const JS_FILES = ['./**/*.js', '!./**/*.min.js', '!./**/*.mod.js', '!./**/*gulpfile.js', '!./**/tests/*.js'];
 const CSS_FILES = ['./**/*.css', '!./**/*.min.css'];
 const HTML_FILES = ['./**/*.html'];
 const PHP_FILES = ['./**/*.php'];
@@ -258,7 +258,7 @@ function _minifyJS(files, reload) {
 		browserify(file, { externalRequireName: `window['require']` })
 			.require(file, { expose: LIB_PREFIX + filename })
 			.bundle()
-			.pipe(source(`${filename}${BUNDLED}${MIN}.js`))
+			.pipe(source(`${filename}${BUNDLED}.js`))
 			.pipe(streamify(babel().on(ERROR, console.log)))
 			.pipe(streamify(uglify()))
 			.pipe(gulp.dest('.'))
