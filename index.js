@@ -23,6 +23,7 @@ const source = require('vinyl-source-stream');
 const streamify = require('gulp-streamify');
 
 const browserify = require('browserify');
+const brfs = require('gulp-brfs');
 
 const babel = require('gulp-babel');
 const rename = require('gulp-rename');
@@ -253,19 +254,25 @@ function _minifyJS(files, reload) {
 			notifyChange(what);
 		}
 	};
+
+	// The bundled file
 	globule.find(files).forEach(function(file) {
 		const filename = path.parse(file).name;
 		browserify(file, { externalRequireName: `window['require']` })
 			.require(file, { expose: LIB_PREFIX + filename })
 			.bundle()
 			.pipe(source(`${filename}${BUNDLED}.js`))
+			.pipe(streamify(brfs()))
 			.pipe(streamify(babel().on(ERROR, console.log)))
 			.pipe(streamify(uglify()))
 			.pipe(gulp.dest('.'))
 			.on(FINISH, () => _r(file));
 	});
+
+	// The normal file
 	gulp
 		.src(files)
+		.pipe(brfs())
 		.pipe(babel().on(ERROR, console.log))
 		.pipe(uglify())
 		.pipe(rename({
