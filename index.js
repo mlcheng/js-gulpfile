@@ -258,15 +258,16 @@ function _minifyJS(files, reload) {
 	// The bundled file
 	globule.find(files).forEach(function(file) {
 		const filename = path.parse(file).name;
+		const destination = `${path.parse(file).dir}/${filename}${BUNDLED}.js`;
 		browserify(file, { externalRequireName: `window['require']` })
 			.require(file, { expose: LIB_PREFIX + filename })
 			.bundle()
-			.pipe(source(`${path.parse(file).dir}/${filename}${BUNDLED}.js`))
+			.pipe(source(destination))
 			.pipe(streamify(brfs()))
 			.pipe(streamify(babel().on(ERROR, console.log)))
 			.pipe(streamify(uglify()))
 			.pipe(gulp.dest(''))
-			.on(FINISH, () => _r(file));
+			.on(FINISH, () => _r(destination));
 	});
 
 	// The normal file
