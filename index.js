@@ -257,8 +257,9 @@ function _minifyJS(files, reload) {
 
 	// The bundled file
 	globule.find(files).forEach(function(file) {
-		const filename = path.parse(file).name;
-		const destination = `${path.parse(file).dir}/${filename}${BUNDLED}.js`;
+		const location = path.parse(file);
+		const filename = location.name;
+		const destination = `${location.dir}/${filename}${BUNDLED}.js`;
 		browserify(file, { externalRequireName: `window['require']` })
 			.require(file, { expose: LIB_PREFIX + filename })
 			.bundle()
@@ -318,13 +319,12 @@ function phpDeps() {
 
 	const _deps = JSON.parse(fs.readFileSync(PHP_DEPENDENCIES_FILE, 'utf8'));
 
-	chdir(INITIAL);
 	_deps.forEach(depObject => {
 		const dependency = Object.keys(depObject);
 		const destination = `${LOCAL}/${depObject[dependency]}`;
 		console.log(`Adding dependency ${dependency}.php to ${destination}`);
 		return gulp
-			.src(`playground/lib-php/${dependency}/${dependency}.php`)
+			.src(`${INITIAL}/../playground/lib-php/${dependency}/${dependency}.php`)
 			.pipe(gulp.dest(destination));
 	});
 }
