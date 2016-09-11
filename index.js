@@ -113,7 +113,7 @@ function watch() {
 
 	gulp.watch([...C.JS_FILES], _minifyAndReload);
 	gulp.watch([...C.CSS_FILES], _minifyAndReload);
-	gulp.watch([...C.MINIFIED_FILES, ...C.HTML_FILES, ...C.PHP_FILES], _reload);
+	gulp.watch([...C.MINIFIED_FILES, ...C.BUNDLED_FILES, ...C.HTML_FILES, ...C.PHP_FILES], _reload);
 
 	function _minifyAndReload(e) {
 		const filename = e.path;

@@ -46,10 +46,15 @@ module.exports = function(files, reload) {
 	try {
 		const bundles = JSON.parse(fs.readFileSync(C.BUNDLE_CONFIG_FILE), 'utf8');
 		bundles.forEach(bundle => {
-			files = globule.find(bundle, {
+			let b = globule.find(bundle, {
 				srcBase: C.Dir.LOCAL,
 				prefixBase: true
-			}).pop();
+			});
+			if(!b.length) {
+				console.log(`Bundle ${bundle} doesn't exist. Check your _bundles.json file.`);
+			} else {
+				files = b.pop();
+			}
 		});
 	} catch(e) {
 		// No bundle
