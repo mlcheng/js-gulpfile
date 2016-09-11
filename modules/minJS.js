@@ -42,7 +42,12 @@ module.exports = function(files, reload) {
 	Get the bundled file from _bundles.json
 	Bundle only the files specified if _bundles.json exists
 	Otherwise, all JS files will be bundled into their own bundle
+
+	`_bundled` is the output file used for browserify
+
+	All JS files will be MINIFIED regardless!
 	 */
+	let _bundled = files;
 	try {
 		const bundles = JSON.parse(fs.readFileSync(C.BUNDLE_CONFIG_FILE), 'utf8');
 		bundles.forEach(bundle => {
@@ -53,7 +58,7 @@ module.exports = function(files, reload) {
 			if(!b.length) {
 				console.log(`Bundle ${bundle} doesn't exist. Check your _bundles.json file.`);
 			} else {
-				files = b.pop();
+				_bundled = b.pop();
 			}
 		});
 	} catch(e) {
@@ -64,9 +69,9 @@ module.exports = function(files, reload) {
 
 	let stream = merge();
 
-	globule.find(files, {
+	globule.find(_bundled, {
 		srcBase: C.Dir.LOCAL,
-		prefixBase: typeof files !== 'string'
+		prefixBase: typeof _bundled !== 'string'
 	}).forEach(function(file) {
 		const location = path.parse(file);
 		const filename = location.name;
