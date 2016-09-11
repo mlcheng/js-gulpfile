@@ -27,13 +27,15 @@ const util = require('./util');
 
 
 module.exports = function(files, reload) {
+	util.chdir(C.Dir.LOCAL);
+
 	return gulp
-		.src(files)
+		.src(files, { base: './' })
 		.pipe(autoprefixer())
 		.pipe(nano())
 		.pipe(rename({
 			suffix: C.Naming.MIN
 		}))
-		.pipe(gulp.dest('.'))
+		.pipe(gulp.dest(''))
 		.on(C.Events.FINISH, () => util.notify(files, reload));
 };

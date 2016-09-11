@@ -25,6 +25,7 @@ const util = require('./util');
 
 module.exports = function() {
 	util.chdir(C.Dir.LOCAL);
+	
 	globule.find([...C.MINIFIED_FILES, ...C.BUNDLED_FILES], {
 		srcBase: C.Dir.LOCAL,
 		prefixBase: true
