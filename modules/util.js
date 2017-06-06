@@ -19,7 +19,6 @@ const globule = require('globule');
 
 // Dev modules
 const C = require('./constants');
-const lrServer = require('./lrServer')();
 
 
 /**
