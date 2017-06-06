@@ -100,28 +100,28 @@ function build(done) {
 }
 
 function minifyJS() {
-	return minJS(C.JS_FILES, false);
+	return minJS(C.JS_FILES);
 }
 
 function minifyCSS() {
-	return minCSS(C.CSS_FILES, false);
+	return minCSS(C.CSS_FILES);
 }
 
 function watch() {
 	console.log(`Starting LiveReload server on port ${C.LR_PORT}...`);
 	lrServer.start();
 
-	gulp.watch([...C.JS_FILES], _minifyAndReload);
-	gulp.watch([...C.CSS_FILES], _minifyAndReload);
+	gulp.watch([...C.JS_FILES], _minify);
+	gulp.watch([...C.CSS_FILES], _minify);
 	gulp.watch([...C.MINIFIED_FILES, ...C.BUNDLED_FILES, ...C.HTML_FILES, ...C.PHP_FILES], _reload);
 
-	function _minifyAndReload(e) {
+	function _minify(e) {
 		const filename = e.path;
 		const filetype = path.parse(filename).ext.replace('.', '');
 		if(filetype === C.FileType.JS) {
-			minJS(filename, true);
+			minJS(filename);
 		} else if(filetype === C.FileType.CSS) {
-			minCSS(filename, true);
+			minCSS(filename);
 		}
 	}
 

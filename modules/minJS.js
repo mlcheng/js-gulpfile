@@ -34,7 +34,7 @@ const C = require('./constants');
 const util = require('./util');
 
 
-module.exports = function(files, reload) {
+module.exports = function(files) {
 	util.chdir(C.Dir.LOCAL);
 
 
@@ -87,7 +87,7 @@ module.exports = function(files, reload) {
 				.pipe(streamify(uglify()))
 				.pipe(gulp.dest(''))
 				.on(C.Events.FINISH, () => {
-					util.notify(destination, reload);
+					util.notify(destination);
 				})
 		);
 	});
@@ -104,7 +104,7 @@ module.exports = function(files, reload) {
 			}))
 			.pipe(gulp.dest(''))
 			.on(C.Events.FINISH, () => {
-				util.notify(files, reload);
+				util.notify(files);
 			})
 	);
 

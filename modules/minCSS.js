@@ -26,7 +26,7 @@ const C = require('./constants');
 const util = require('./util');
 
 
-module.exports = function(files, reload) {
+module.exports = function(files) {
 	util.chdir(C.Dir.LOCAL);
 
 	return gulp
@@ -37,5 +37,5 @@ module.exports = function(files, reload) {
 			suffix: C.Naming.MIN
 		}))
 		.pipe(gulp.dest(''))
-		.on(C.Events.FINISH, () => util.notify(files, reload));
+		.on(C.Events.FINISH, () => util.notify(files));
 };

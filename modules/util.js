@@ -35,9 +35,8 @@ function chdir(to) {
  * Notifies the user that the file has completed.
  * Notifies live-reload server if specified
  * @param  {Object} files  Files that have completed
- * @param  {Boolean} reload Whether or not to notify live-reload
  */
-function notify(files, reload) {
+function notify(files) {
 	if(typeof files !== 'string') {
 		globule.find(files, {
 			srcBase: C.Dir.LOCAL,
@@ -45,11 +44,6 @@ function notify(files, reload) {
 		}).forEach(file => console.log(`Finished ${file}`));
 	} else {
 		console.log(`Finished ${files}`);
-	}
-
-	// Notify live reload server if needed
-	if(reload) {
-		lrServer.reload(files);
 	}
 }
 
