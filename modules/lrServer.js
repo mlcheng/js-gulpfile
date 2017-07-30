@@ -22,16 +22,39 @@ const tinylr = require('tiny-lr')();
 const C = require('./constants');
 
 
-module.exports = function() {
+const queue = [];
+let timer;
+
+module.exports = () => {
 	let shell = {};
 
-	shell.start = function() {
+	shell.start = () => {
 		tinylr.listen(C.LR_PORT, console.log);
 	};
 
-	shell.reload = function(file) {
-		console.log(`Reloading ${file}`);
+	shell.reload = (file) => {
+		console.log('\x1b[1;32;40m%s\x1b[0m', `Reloading ${file}`);
 		request(`${C.LR_SERVER}/changed?files=${file}`);
+	};
+
+	shell.queueForReload = (file) => {
+		console.log(`Queueing ${file} for reload...`);
+		queue.push(file);
+
+		if(timer) {
+			clearTimeout(timer);
+		}
+		timer = setTimeout(() => {
+			console.log('\nReloading files...');
+			// Reload all files in queue.
+			while(true) {
+				const f = queue.pop();
+				shell.reload(f);
+				if(!queue.length) {
+					break;
+				}
+			}
+		}, 800);
 	};
 
 	return shell;

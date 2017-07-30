@@ -125,6 +125,6 @@ function watch() {
 	}
 
 	function _reload(e) {
-		lrServer.reload(e.path);
+		lrServer.queueForReload(e.path);
 	}
 }

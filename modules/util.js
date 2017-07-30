@@ -32,7 +32,6 @@ function chdir(to) {
 
 /**
  * Notifies the user that the file has completed.
- * Notifies live-reload server if specified
  * @param  {Object} files  Files that have completed
  */
 function notify(files) {
