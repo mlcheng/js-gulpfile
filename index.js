@@ -93,10 +93,9 @@ function help() {
 
 function build(done) {
 	console.log('Finished build');
-	done();
 
 	// Run tests after everything is complete
-	test();
+	test(done);
 }
 
 function minifyJS() {

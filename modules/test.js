@@ -11,7 +11,7 @@
 
 'use strict';
 
-/* globals require, module, process */
+/* globals require, module */
 
 // Vendor modules
 const exec = require('child_process').exec;
@@ -65,17 +65,27 @@ function getTestDirectoriesFor(path) {
 	return directories.filter(directory => directory.split('/').pop() === 'tests');
 }
 
-module.exports = function() {
-	console.log('Running tests...');
+module.exports = done => {
+	console.log('Running tests...\n');
 	// Find all `tests/` directories
 	const testDirs = getTestDirectoriesFor(C.Dir.LOCAL);
 
-	testDirs.forEach(testDir => {
-		console.log(`Found tests for ${testDir}...`);
-		exec(`cd ${testDir} && node .`, function(err) {
-			if(err) {
-				return console.log('No tests available');
-			}
-		}).stdout.pipe(process.stdout);
+	// Run all the tests
+	const runTests = new Promise(resolve => {
+		testDirs.forEach((testDir, idx) => {
+			exec(`cd ${testDir} && node .`, (err, stdout) => {
+				console.log(`Found tests for ${testDir}...`);
+				console.log(stdout);
+				if(err) {
+					return console.log('No tests available');
+				}
+				if(idx === testDirs.length - 1) {
+					resolve();
+				}
+			});
+		});
 	});
+
+	// Notify that the task is done by calling the callback
+	runTests.then(done);
 };
