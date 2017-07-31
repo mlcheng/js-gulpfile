@@ -37,6 +37,9 @@ module.exports = () => {
 		request(`${C.LR_SERVER}/changed?files=${file}`);
 	};
 
+	/**
+	 * Queue files for reload. This debounces the reload process by only reloading if nothing has entered the queue in 1.2 seconds.
+	 */
 	shell.queueForReload = (file) => {
 		console.log(`Queueing ${file} for reload...`);
 		queue.push(file);
@@ -54,7 +57,7 @@ module.exports = () => {
 					break;
 				}
 			}
-		}, 800);
+		}, 1200);
 	};
 
 	return shell;
