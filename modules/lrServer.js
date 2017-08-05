@@ -50,12 +50,9 @@ module.exports = () => {
 		timer = setTimeout(() => {
 			console.log('\nReloading files...');
 			// Reload all files in queue.
-			while(true) {
+			while(queue.length) {
 				const f = queue.pop();
 				shell.reload(f);
-				if(!queue.length) {
-					break;
-				}
 			}
 		}, 1200);
 	};

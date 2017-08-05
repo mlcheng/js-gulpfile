@@ -50,12 +50,11 @@ function _getDirectoriesFor(path) {
 function recursiveGetDirectoriesFor(path) {
 	let stack = [path];
 	let directories = [];
-	while(true) {
+	while(stack.length) {
 		let current = stack.pop();
 		const subdirs = _getDirectoriesFor(current);
 		stack = [...stack, ...subdirs];
 		directories = [...directories, ...subdirs];
-		if(!stack.length) break;
 	}
 	return directories;
 }
