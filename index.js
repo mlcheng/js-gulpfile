@@ -27,6 +27,7 @@ const minJS = require('./modules/minJS');
 const minCSS = require('./modules/minCSS');
 const phpDeps = require('./modules/phpDeps');
 const test = require('./modules/test');
+const injectReloadMixin = require('./mixins/injectReload');
 
 
 const TASKS = [
@@ -107,18 +108,21 @@ function minifyCSS() {
 }
 
 function watch() {
-	console.log(`Starting LiveReload server on port ${C.LR_PORT}...`);
 	lrServer.start();
 
 	gulp.watch([...C.JS_FILES], _minify);
 	gulp.watch([...C.CSS_FILES], _minify);
 	gulp.watch([...C.MINIFIED_FILES, ...C.BUNDLED_FILES, ...C.HTML_FILES, ...C.PHP_FILES], _reload);
 
+	function _getFiletype(filename) {
+		return path.parse(filename).ext.replace('.', '');
+	}
+
 	function _minify(e) {
 		const filename = e.path;
-		const filetype = path.parse(filename).ext.replace('.', '');
-		if(filetype === C.FileType.JS) {
-			minJS(filename);
+		const filetype = _getFiletype(filename);
+		if(filetype  === C.FileType.JS) {
+			minJS(filename, injectReloadMixin(lrServer.getPort()));
 		} else if(filetype === C.FileType.CSS) {
 			minCSS(filename);
 		}

@@ -34,7 +34,10 @@ const C = require('./constants');
 const util = require('./util');
 
 
-module.exports = function(files) {
+/**
+ * Mixins are used to add something to the build pipeline.
+ */
+module.exports = function(files, mixin) {
 	util.chdir(C.Dir.LOCAL);
 
 
@@ -76,36 +79,48 @@ module.exports = function(files) {
 		const location = path.parse(file);
 		const filename = location.name;
 		const destination = `${location.dir}/${filename}${C.Naming.BUNDLED}.js`;
-		stream.add(
-			browserify(file, { externalRequireName: `window['require']` })
-				.require(file, { expose: C.Naming.LIB_PREFIX + filename })
-				.on(C.Events.FILE, () => util.chdir(C.Dir.LOCAL))
-				.bundle()
-				.pipe(source(destination))
-				.pipe(streamify(brfs()))
-				.pipe(streamify(babel().on(C.Events.ERROR, console.log)))
-				.pipe(streamify(uglify()))
-				.pipe(gulp.dest(''))
-				.on(C.Events.FINISH, () => {
-					util.notify(destination);
-				})
+		let modPipe = browserify(file, {
+			externalRequireName: `window['require']`
+		})
+			.require(file, { expose: C.Naming.LIB_PREFIX + filename })
+			.on(C.Events.FILE, () => util.chdir(C.Dir.LOCAL))
+			.bundle()
+			.pipe(source(destination))
+			.pipe(streamify(brfs()))
+			.pipe(streamify(babel().on(C.Events.ERROR, console.log)))
+			.pipe(streamify(uglify()));
+
+		if(mixin) {
+			modPipe = modPipe.pipe(streamify(mixin()));
+		}
+
+		stream.add(modPipe
+			.pipe(gulp.dest(''))
+			.on(C.Events.FINISH, () => {
+				util.notify(destination);
+			})
 		);
 	});
 
 
-	stream.add(
-		gulp
-			.src(files, { base: './' })
-			.pipe(brfs())
-			.pipe(babel().on(C.Events.ERROR, console.log))
-			.pipe(uglify())
-			.pipe(rename({
-				suffix: C.Naming.MIN
-			}))
-			.pipe(gulp.dest(''))
-			.on(C.Events.FINISH, () => {
-				util.notify(files);
-			})
+	let minPipe = gulp
+		.src(files, { base: './' })
+		.pipe(brfs())
+		.pipe(babel().on(C.Events.ERROR, console.log))
+		.pipe(uglify())
+		.pipe(rename({
+			suffix: C.Naming.MIN
+		}));
+
+	if(mixin) {
+		minPipe = minPipe.pipe(mixin());
+	}
+
+	stream.add(minPipe
+		.pipe(gulp.dest(''))
+		.on(C.Events.FINISH, () => {
+			util.notify(files);
+		})
 	);
 
 	return stream;
