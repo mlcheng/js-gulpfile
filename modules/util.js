@@ -26,7 +26,6 @@ const C = require('./constants');
  * @param  {String} to The directory to change to
  */
 function chdir(to) {
-	//console.log(`\n> ${to}`);
 	process.chdir(to);
 }
 
