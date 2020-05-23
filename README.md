@@ -1,5 +1,7 @@
 # js-gulpfile
 
+## This is DEPRECATED. Please use Ceres instead.
+
 Using this gulpfile, you can easily build your front-end projects.*
 
 \**As long as you agree with my development conventions.*
